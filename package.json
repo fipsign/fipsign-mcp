@@ -1,0 +1,48 @@
+{
+  "name": "@fipsign/mcp",
+  "version": "0.1.0",
+  "description": "MCP server for FIPSign — post-quantum signing via ML-DSA-65 (NIST FIPS 204)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "fipsign-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "fipsign",
+    "post-quantum",
+    "ml-dsa",
+    "signing",
+    "cryptography",
+    "nist",
+    "fips-204"
+  ],
+  "author": "FIPSign",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fipsign/fipsign-mcp.git"
+  },
+  "homepage": "https://fipsign.dev",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.15.0",
+    "@noble/post-quantum": "^0.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.20",
+    "typescript": "^5.5.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
