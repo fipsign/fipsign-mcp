@@ -2,9 +2,9 @@
 /**
  * @fipsign/mcp — MCP server for FIPSign post-quantum signing API
  *
- * Exposes 15 tools covering the full FIPSign runtime API:
+ * Exposes 11 tools covering the full FIPSign runtime API:
  * signing, verification, revocation, usage, CA certificate lifecycle,
- * key pair generation, and webhook management.
+ * and key pair generation.
  *
  * Configuration:
  *   FIPSIGN_API_KEY  — required for most tools (pqa_ + 64 hex chars)
@@ -301,65 +301,6 @@ const TOOLS: Tool[] = [
       required: [],
     },
   },
-
-  // ── Webhooks ─────────────────────────────────────────────────────────────────
-
-  {
-    name: "fipsign_webhooks_register",
-    description:
-      "Register or update a webhook endpoint that will receive real-time event notifications. Available events: 'token.signed', 'token.rejected', 'token.revoked', 'limit.warning' (fired at 20% free tokens remaining), 'limit.reached' (fired when free tokens are exhausted). If omitted, all events are subscribed. Re-registering an existing webhook updates the URL and events but preserves the original secret — to rotate the secret, delete and re-register. The 'secret' field in the response is shown only once — store it securely to verify incoming request signatures via HMAC-SHA256 on the X-PQAuth-Signature header.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        url: {
-          type: "string",
-          description: "HTTPS endpoint that will receive POST requests. Must be a valid HTTPS URL accessible from the internet. Example: 'https://yourapp.com/webhooks/fipsign'.",
-        },
-        events: {
-          type: "array",
-          items: {
-            type: "string",
-            enum: ["token.signed", "token.rejected", "token.revoked", "limit.warning", "limit.reached"],
-          },
-          description: "Optional list of events to subscribe to. Defaults to all events if omitted.",
-        },
-      },
-      required: ["url"],
-    },
-  },
-
-  {
-    name: "fipsign_webhooks_get",
-    description:
-      "Get the current webhook configuration (URL, subscribed events, active status, creation timestamp). The webhook secret is never returned after initial registration — only the URL and event list. Returns null webhook if no webhook has been registered.",
-    inputSchema: {
-      type: "object",
-      properties: {},
-      required: [],
-    },
-  },
-
-  {
-    name: "fipsign_webhooks_delete",
-    description:
-      "Delete the current webhook configuration. After deletion, no events will be delivered until a new webhook is registered via fipsign_webhooks_register.",
-    inputSchema: {
-      type: "object",
-      properties: {},
-      required: [],
-    },
-  },
-
-  {
-    name: "fipsign_webhooks_test",
-    description:
-      "Send a test 'token.signed' event to the registered webhook endpoint. Use this immediately after registering a webhook to confirm delivery is working before relying on it in production. Requires a webhook to be registered first.",
-    inputSchema: {
-      type: "object",
-      properties: {},
-      required: [],
-    },
-  },
 ];
 
 // ─── Tool handlers ────────────────────────────────────────────────────────────
@@ -418,7 +359,6 @@ async function handleTool(name: string, args: Record<string, unknown>) {
         return err('"token" is required and must be the token object returned by fipsign_sign');
       }
       const { ok: success, data } = await apiRequest("POST", "/verify", { token });
-      // verify returns valid:false on failure — not necessarily an HTTP error
       return ok(data);
     }
 
@@ -487,38 +427,6 @@ async function handleTool(name: string, args: Record<string, unknown>) {
     case "fipsign_ca_get_crl": {
       const { ok: success, data } = await apiRequest("GET", "/ca/crl");
       if (!success) return err("CA get CRL failed", data);
-      return ok(data);
-    }
-
-    // ── Webhooks ──────────────────────────────────────────────────────────────
-
-    case "fipsign_webhooks_register": {
-      const { url, events } = args;
-      if (!url || typeof url !== "string") {
-        return err('"url" is required');
-      }
-      const body: Record<string, unknown> = { url };
-      if (events !== undefined) body.events = events;
-      const { ok: success, data } = await apiRequest("POST", "/webhooks", body);
-      if (!success) return err("Webhook register failed", data);
-      return ok(data);
-    }
-
-    case "fipsign_webhooks_get": {
-      const { ok: success, data } = await apiRequest("GET", "/webhooks");
-      if (!success) return err("Webhook get failed", data);
-      return ok(data);
-    }
-
-    case "fipsign_webhooks_delete": {
-      const { ok: success, data } = await apiRequest("DELETE", "/webhooks");
-      if (!success) return err("Webhook delete failed", data);
-      return ok(data);
-    }
-
-    case "fipsign_webhooks_test": {
-      const { ok: success, data } = await apiRequest("POST", "/webhooks/test");
-      if (!success) return err("Webhook test failed", data);
       return ok(data);
     }
 
