@@ -1,6 +1,6 @@
 {
   "name": "@fipsign/mcp",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "MCP server for FIPSign — post-quantum signing via ML-DSA-65 (NIST FIPS 204)",
   "type": "module",
   "main": "./dist/index.js",
