@@ -440,7 +440,7 @@ async function handleTool(name: string, args: Record<string, unknown>) {
 const server = new Server(
   {
     name: "fipsign-mcp",
-    version: "0.1.1",
+    version: process.env.npm_package_version ?? "0.1.2",
   },
   {
     capabilities: {
