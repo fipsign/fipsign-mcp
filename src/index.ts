@@ -104,7 +104,7 @@ const TOOLS: Tool[] = [
   {
     name: "fipsign_health",
     description:
-      "Check the health of the FIPSign service. Returns the service status, algorithm (ML-DSA-65), NIST standard, and version. No API key required. Use this to verify the service is reachable before running other operations.",
+      "Check the health of the FIPSign service. Returns the service status, algorithm (ML-DSA-44/65/87), NIST standard, and version. No API key required. Use this to verify the service is reachable before running other operations.",
     inputSchema: {
       type: "object",
       properties: {},
@@ -115,7 +115,7 @@ const TOOLS: Tool[] = [
   {
     name: "fipsign_public_key",
     description:
-      "Get the current ML-DSA-65 public key of the FIPSign server. Returns a base64-encoded 1952-byte public key. Use this when you need to verify token signatures independently without calling the /verify endpoint (e.g. for offline verification or third-party auditing). No API key required.",
+      "Get the ML-DSA public key for the project associated with the API key. The key size depends on the project's configured algorithm (ML-DSA-44: 1312 bytes, ML-DSA-65: 1952 bytes, ML-DSA-87: 2592 bytes). Use this when you need to verify token signatures independently without calling the /verify endpoint. Requires API key.",
     inputSchema: {
       type: "object",
       properties: {},
@@ -128,7 +128,7 @@ const TOOLS: Tool[] = [
   {
     name: "fipsign_sign",
     description:
-      "Sign any payload with ML-DSA-65 (NIST FIPS 204). The only required field is 'sub' — any string identifying the entity being signed: a user ID, order ID, document hash, device serial, AI agent action, or anything else. All other fields are stored in the payload and returned on verify. Costs 1 token. Returns the signed token object (payload, signature, algorithm, issuedAt) plus usage info.",
+      "Sign any payload with ML-DSA (NIST FIPS 204) — algorithm is ML-DSA-44, ML-DSA-65, or ML-DSA-87 depending on the project configuration. The only required field is 'sub' — any string identifying the entity being signed: a user ID, order ID, document hash, device serial, AI agent action, or anything else. All other fields are stored in the payload and returned on verify. Costs 1 token. Returns the signed token object (payload, signature, algorithm, issuedAt) plus usage info.",
     inputSchema: {
       type: "object",
       properties: {
@@ -151,7 +151,7 @@ const TOOLS: Tool[] = [
   {
     name: "fipsign_verify",
     description:
-      "Verify a FIPSign token signed with ML-DSA-65. Checks the cryptographic signature, expiry, and revocation list. Returns valid:true with the decoded payload on success, or valid:false with an error message on failure. Never throws — always returns a result. Costs 1 token.",
+      "Verify a FIPSign token. Checks the cryptographic signature (ML-DSA-44, ML-DSA-65, or ML-DSA-87 — read from token.algorithm), expiry, and revocation list. Returns valid:true with the decoded payload on success, or valid:false with an error message on failure. Never throws — always returns a result. Costs 1 token.",
     inputSchema: {
       type: "object",
       properties: {
