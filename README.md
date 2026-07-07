@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![NIST FIPS 204](https://img.shields.io/badge/NIST-FIPS%20204-blue)](https://csrc.nist.gov/pubs/fips/204/final)
 
-MCP server for [FIPSign](https://fipsign.dev) — post-quantum digital signing via **ML-DSA-65** (NIST FIPS 204).
+MCP server for [FIPSign](https://fipsign.dev) — post-quantum digital signing via **ML-DSA-44/65/87** (NIST FIPS 204).
 
 Gives Claude Desktop, Claude Code, and any MCP-compatible AI agent full access to the FIPSign API without writing code: sign payloads, verify tokens, issue and revoke post-quantum certificates, and monitor usage.
 
@@ -15,7 +15,7 @@ Gives Claude Desktop, Claude Code, and any MCP-compatible AI agent full access t
 | Tool | Description | Token cost |
 |---|---|---|
 | `fipsign_health` | Check service status | free |
-| `fipsign_public_key` | Get the server's ML-DSA-65 public key | free |
+| `fipsign_public_key` | Get the project's ML-DSA public key (requires API key) | free |
 | `fipsign_sign` | Sign any payload | 1 token |
 | `fipsign_verify` | Verify a signed token | 1 token |
 | `fipsign_revoke` | Permanently revoke a token | 1 token |
@@ -153,7 +153,7 @@ Or manually in your project's `.claude/mcp.json`:
 | `FIPSIGN_API_KEY` | Yes (for most tools) | — | Your FIPSign API key. Format: `pqa_` + 64 lowercase hex chars. Get one at app.fipsign.dev. |
 | `FIPSIGN_BASE_URL` | No | `https://api.fipsign.dev` | Override API base URL (useful for self-hosted instances or local dev). |
 
-`fipsign_health`, `fipsign_public_key`, and `fipsign_generate_key_pair` work without an API key.
+`fipsign_health` and `fipsign_generate_key_pair` work without an API key. `fipsign_public_key` requires an API key — it returns the public key for the project associated with that key.
 
 ---
 
@@ -163,7 +163,7 @@ Once configured, you can ask Claude:
 
 **Signing:**
 - *"Sign a token for user_123 with role admin that expires in 1 hour"*
-- *"Verify this token: { payload: '...', signature: '...', algorithm: 'ML-DSA-65', issuedAt: 123 }"*
+- *"Verify this token: { payload: '...', signature: '...', algorithm: 'ML-DSA-65', issuedAt: 123 }"* *(algorithm may be ML-DSA-44, ML-DSA-65, or ML-DSA-87 depending on the project)*
 - *"Revoke this token because the user logged out"*
 
 **Certificates:**
